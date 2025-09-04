@@ -22,7 +22,6 @@ $(call Device/friendlyarm_nanopi-r2c,$(1))
   BOOT_SCRIPT := rk3328-friendlyelec
 endef
 
-
 # RK3528
 
 define Device/Legacy/rk3528
@@ -59,7 +58,6 @@ $(call Device/Legacy/rk3528,$(1))
   DEVICE_PACKAGES += kmod-nvme kmod-hwmon-pwmfan kmod-thermal kmod-switch-rtl8367b swconfig
 endef
 TARGET_DEVICES += radxa_e24c
-
 
 # RK3568
 
@@ -149,7 +147,6 @@ $(call Device/friendlyarm_nanopi-r5c,$(1))
   BOOT_SCRIPT := rk3568-friendlyelec
 endef
 
-
 define Device/rk3568/hinlink
 $(call Device/Legacy/rk3568,$(1))
   DEVICE_VENDOR := HINLINK
@@ -179,7 +176,6 @@ $(call Device/Legacy/rk3568,$(1))
 endef
 TARGET_DEVICES += lyt_t68m
 
-
 # RK3576
 
 define Device/Legacy/rk3576
@@ -197,7 +193,6 @@ $(call Device/Legacy/rk3576,$(1))
   DEVICE_PACKAGES += kmod-r8169 kmod-hwmon-pwmfan kmod-thermal
 endef
 TARGET_DEVICES += friendlyarm_nanopi-r76s
-
 
 # RK3588
 
@@ -297,3 +292,18 @@ $(call Device/Legacy/rk3588,$(1))
   DEVICE_PACKAGES += kmod-r8169 kmod-nvme kmod-ata-ahci-dwc kmod-hwmon-pwmfan kmod-thermal 
 endef
 TARGET_DEVICES += cyber_cyber3588-aib
+
+# -----------------------
+# JPTV Box - RK3566
+define Device/jptv_rk3566
+$(call Device/Legacy/rk3566,$(1))
+  DEVICE_VENDOR := JPTV
+  DEVICE_MODEL := JPTV Box
+  DEVICE_DTS := rk3568/rk3566-jptv
+  DEVICE_PACKAGES := kmod-rga3 \
+                     kmod-rk_vcodec \
+                     kmod-iio-rockchip-saradc \
+                     kmod-r8169 \
+                     kmod-nvme
+endef
+TARGET_DEVICES += jptv_rk3566
