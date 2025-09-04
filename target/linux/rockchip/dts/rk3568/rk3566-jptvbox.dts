@@ -1,0 +1,161 @@
+/dts-v1/;
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/pinctrl/rockchip.h>
+#include <dt-bindings/soc/rockchip,vop2.h>
+#include <rockchip/rk3566.dtsi>
+#include "rk3566.dtsi"
+
+/ {
+    model = "JianPian TV Box";
+    compatible = "jianpian,tvbox", "rockchip,rk3566";
+
+    chosen {
+        stdout-path = "serial2:1500000n8";
+    };
+
+    aliases {
+        mmc0 = &sdhci;   // eMMC 启动
+    };
+
+    leds {
+        compatible = "gpio-leds";
+        diy-led {
+            label = "diy-led";
+            gpios = <&gpio0 RK_PD4 GPIO_ACTIVE_HIGH>;
+            default-state = "on";
+        };
+    };
+
+    ir-receiver {
+        compatible = "gpio-ir-receiver";
+        gpios = <&gpio0 RK_PC2 GPIO_ACTIVE_LOW>;
+    };
+
+    /* 电源管理 */
+    vcc5v0_sys: vcc5v0-sys {
+        compatible = "regulator-fixed";
+        regulator-name = "vcc5v0_sys";
+        regulator-min-microvolt = <5000000>;
+        regulator-max-microvolt = <5000000>;
+        regulator-always-on;
+        regulator-boot-on;
+    };
+
+    vcc3v3_sys: vcc3v3-sys {
+        compatible = "regulator-fixed";
+        regulator-name = "vcc3v3_sys";
+        regulator-min-microvolt = <3300000>;
+        regulator-max-microvolt = <3300000>;
+        regulator-always-on;
+        regulator-boot-on;
+    };
+};
+
+/* UART2 作为 debug 串口 */
+&uart2 {
+    status = "okay";
+};
+
+/* eMMC (sdhci) */
+&sdhci {
+    bus-width = <8>;
+    non-removable;
+    mmc-hs200-1_8v;
+    vmmc-supply = <&vcc3v3_sys>;
+    vqmmc-supply = <&vcc3v3_sys>;
+    status = "okay";
+};
+
+/* GMAC1 千兆网口 */
+&gmac1 {
+    phy-handle = <&rgmii_phy>;
+    phy-mode = "rgmii";
+    clock_in_out = "input";
+    snps,reset-gpio = <&gpio3 RK_PA7 GPIO_ACTIVE_LOW>;
+    snps,reset-active-low;
+    snps,reset-delays-us = <0 10000 50000>;
+    tx_delay = <0x30>;
+    rx_delay = <0x10>;
+    status = "okay";
+};
+
+&mdio1 {
+    rgmii_phy: ethernet-phy@1 {
+        reg = <1>;
+    };
+};
+
+/* USB2/USB3 Host */
+&usb_host0_ehci {
+    status = "okay";
+};
+&usb_host0_ohci {
+    status = "okay";
+};
+&usbdrd3_0 {
+    status = "okay";
+};
+&usbdrd_dwc3_0 {
+    status = "okay";
+};
+
+/* HDMI 输出 */
+&hdmi {
+    status = "okay";
+};
+
+&hdmi_sound {
+    status = "okay";
+};
+
+/* Codec 声卡 (rk809/hdmi) */
+&rk809 {
+    status = "okay";
+
+    regulators {
+        vdd_logic: DCDC_REG1 {
+            regulator-name = "vdd_logic";
+            regulator-always-on;
+        };
+        vdd_arm: DCDC_REG2 {
+            regulator-name = "vdd_arm";
+            regulator-always-on;
+        };
+        vcc_ddr: DCDC_REG3 {
+            regulator-name = "vcc_ddr";
+            regulator-always-on;
+        };
+        vcc_3v3: DCDC_REG4 {
+            regulator-name = "vcc_3v3";
+            regulator-always-on;
+        };
+    };
+};
+
+&rk809_codec {
+    status = "okay";
+};
+
+&i2s1_8ch {
+    status = "okay";
+};
+
+&sound {
+    status = "okay";
+    simple-audio-card,format = "i2s";
+    simple-audio-card,name = "rk809-sound";
+    simple-audio-card,widgets =
+        "Headphone", "Headphones",
+        "Microphone", "Mic Jack";
+    simple-audio-card,routing =
+        "Headphones", "HPOL",
+        "Headphones", "HPOR",
+        "MICBIAS1", "Mic Jack",
+        "IN1P", "Mic Jack";
+    simple-audio-card,cpu {
+        sound-dai = <&i2s1_8ch>;
+    };
+    simple-audio-card,codec {
+        sound-dai = <&rk809_codec>;
+    };
+};
